@@ -1,0 +1,71 @@
+a {
+    text-decoration: none !important;
+}
+
+#select-grid-size {
+    margin: 5px 5px 5px 0;
+}
+
+#header, #view {
+    padding: 5px;
+    margin-bottom: 15px;
+}
+.color {
+    width: 40px;
+    height: 40px;
+    outline: 1px solid grey;
+    float: left;
+    margin: 5px;
+
+}
+
+.color:hover, .square:hover {
+    outline: 2px solid black;
+}
+
+.square {
+    height: 50px;
+    width: 50px;
+    outline: 1px solid grey;
+    float: left;
+}
+
+#colors-count {
+    width: 50px;
+}
+#colors-view, #grid-view {
+    outline: 1px solid grey;
+    width: 100%;
+    height: 300px;
+    overflow: auto;
+}
+
+#title {
+    font-weight: bold;
+    text-align: center;
+}
+
+#colors-setting {
+    float: right;
+    margin-right: 10px;
+}
+
+#selected-color-span {
+    float: left;
+    position: relative;
+    top: 5px;
+}
+
+#regenerate-colors {
+    float: left;
+    position: relative;
+    top: 2px;
+    margin-left: 5px;
+}
+
+#select-grid-div {
+    float: right;
+}
+#footer {
+    font-size: 12px;
+}

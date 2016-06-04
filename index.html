@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script type="text/javascript" src="colorApp.js"></script>
+    <title>Color-It!</title>
+</head>
+<body>
+<div id="title">Color-It!</div>
+<div id="header">
+    <div id="regenerate-colors">
+        <a href="#" onClick="colorApp.regenerateColors();">Regenerate Colors</a>
+    </div>
+    <div id="colors-setting">
+        # Colors: <input id="colors-count" type="text" name="colors" value=8
+                         onkeyup="colorApp.onKeyUp(event);" >
+        <button id="save-button" type="submit" value="Submit"
+                onClick="colorApp.changeColorsView(document.getElementById('colors-count').value);">Save
+        </button>
+    </div>
+</div>
+
+<div id="view">
+    <div id="colors-view" onscroll="colorApp.addColors();"></div>
+    <div style="margin: 5px;">
+        <span id="selected-color-span">Selected Color: <span id="selected-color"></span></span>
+        <div id="select-grid-div">
+            Grid-Size: <select id="select-grid-size" onchange="colorApp.changeGrid();">
+                       </select>
+        </div>
+    </div>
+    <div id="grid-view">
+        <div id="grid"></div>
+    </div>
+</div>
+
+<div id="footer">Prashant Kumar, Iowa State University</div>
+</body>
+</html>
