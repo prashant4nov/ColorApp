@@ -173,7 +173,9 @@
                     squareEl.style.height = this.squareDimension + 'px';
                     squareEl.addEventListener('click',
                             function () {
-                                this.style.backgroundColor = _this.selectedColor;
+                                if(_this.selectedColor!==null) {
+                                    this.style.backgroundColor = _this.selectedColor;
+                                }
                             }, false);
                     gridEl.appendChild(squareEl);
                 }
@@ -188,6 +190,8 @@
                 }
             },
             regenerateColors: function () {
+                this.selectedColor = null;
+                document.getElementById(this.selectedColorSpanId).innerHTML = '';
                 if (this.selectedColorId !== null) {
                     document.getElementById(this.selectedColorId).classList.remove(this.highlightColor);
                 }
