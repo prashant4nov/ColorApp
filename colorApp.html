@@ -188,7 +188,9 @@
                 }
             },
             regenerateColors: function () {
-                document.getElementById(this.selectedColorId).classList.remove(this.highlightColor);
+                if (this.selectedColorId !== null) {
+                    document.getElementById(this.selectedColorId).classList.remove(this.highlightColor);
+                }
                 var colors = document.getElementById(this.colorsDivId).childNodes;
                 for (var color = 0; color < colors.length; color++) {
                     colors[color].style.backgroundColor = this.getRandomColor();
