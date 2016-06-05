@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        a {
+            text-decoration: none !important;
+        }
+
+        #select-grid-size {
+            margin: 5px 5px 5px 0;
+        }
+
+        #header, #view {
+            padding: 5px;
+            margin-bottom: 15px;
+        }
+
+        .color {
+            width: 40px;
+            height: 40px;
+            outline: 1px solid grey;
+            float: left;
+            margin: 5px;
+
+        }
+
+        .color:hover, .square:hover {
+            outline: 2px solid black;
+            position: relative;
+        }
+
+        .square {
+            outline: 1px solid grey;
+            float: left;
+        }
+
+        #colors-count {
+            width: 50px;
+        }
+
+        #colors-view, #grid-view {
+            outline: 1px solid grey;
+            width: 100%;
+            height: 300px;
+            overflow: auto;
+        }
+
+        #title {
+            font-weight: bold;
+            text-align: center;
+        }
+
+        #colors-setting {
+            float: right;
+            margin-right: 10px;
+        }
+
+        #resize-squares {
+            float: right;
+            position: relative;
+            top: 5px;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        #selected-color-span {
+            float: left;
+            position: relative;
+            top: 5px;
+        }
+
+        #regenerate-colors {
+            float: left;
+            position: relative;
+            top: 2px;
+            margin: 0 0 0 5px;
+        }
+
+        #select-grid-div {
+            float: right;
+        }
+
+        .highlightColor {
+            outline: 2px solid black;
+        }
+
+        #footer {
+            font-size: 12px;
+        }
+    </style>
+    <script type="text/javascript">
+        /**
+         * Created by Prashant Kumar on 6/2/16.
+         */
+        var colorApp = {
+            settings: {
+                colors: 8,
+                gridSize: 2
+            },
+            selectedColor: null,
+            minColors: 2,
+            minDimension: 15,
+            colorCodeLength: 6,
+            maxColorsAllowed: 16777216,
+            gridSizeMaxLimit: 100,
+            colorsViewHeight: 300,
+            colorsVisible: 0,
+            colorsLimit: 1000,
+            squareDimension: 50,
+            enterKeyCode: 13,
+            colorsDivId: 'colors-view',
+            gridDivId: 'grid',
+            gridSelectId: 'select-grid-size',
+            colorsInputId: 'colors-count',
+            colorClass: 'color',
+            squareClass: 'square',
+            selectedColorId: null,
+            selectedColorSpanId: 'selected-color',
+            saveButtonId: 'save-button',
+            highlightColor: 'highlightColor',
+            init: function () {
+                if (typeof(Storage) !== 'undefined') {
+                    if (sessionStorage.gridSize) {
+                        this.settings.gridSize = Number(sessionStorage.gridSize);
+                    }
+                    if (sessionStorage.colors) {
+                        this.settings.colors = Number(sessionStorage.colors);
+                    }
+                }
+                this.renderGridSettingOption();
+                this.renderColorsView();
+                this.renderGridView();
+
+                document.getElementById(this.gridSelectId).value = this.settings.gridSize;
+                document.getElementById(this.colorsInputId).value = this.settings.colors;
+            },
+            renderColorsView: function () {
+                var _this = this;
+                var colorsEl = document.getElementById(this.colorsDivId);
+                var colors = this.settings.colors - this.colorsVisible;
+                if (colors > this.colorsLimit) {
+                    colors = this.colorsLimit;
+                }
+                for (var color = 1; color <= colors; color++) {
+                    var colorEl = document.createElement('Div');
+                    colorEl.setAttribute('class', this.colorClass);
+                    colorEl.id = 'color-' + color;
+                    colorEl.style.backgroundColor = this.getRandomColor();
+                    colorEl.addEventListener('click',
+                            function () {
+                                _this.selectedColor = this.style.backgroundColor;
+                                if (_this.selectedColorId !== null) {
+                                    document.getElementById(_this.selectedColorId).classList.remove(_this.highlightColor);
+                                }
+                                this.classList.add(_this.highlightColor);
+                                _this.selectedColorId = this.id;
+                                document.getElementById(_this.selectedColorSpanId).innerHTML = _this.selectedColor;
+                            }, false);
+                    colorsEl.appendChild(colorEl);
+                }
+                this.colorsVisible = this.colorsVisible + colors;
+            },
+            renderGridView: function () {
+                var _this = this;
+                var gridEl = document.getElementById(this.gridDivId);
+                gridEl.innerHTML = "";
+                var squares = Math.pow(this.settings.gridSize, 2);
+                for (var square = 1; square <= squares; square++) {
+                    var squareEl = document.createElement('Div');
+                    squareEl.setAttribute('class', this.squareClass);
+                    squareEl.style.width = this.squareDimension + 'px';
+                    squareEl.style.height = this.squareDimension + 'px';
+                    squareEl.addEventListener('click',
+                            function () {
+                                this.style.backgroundColor = _this.selectedColor;
+                            }, false);
+                    gridEl.appendChild(squareEl);
+                }
+                gridEl.style.width = this.settings.gridSize * this.squareDimension + 'px';
+            },
+            addColors: function () {
+                var colorsEl = document.getElementById(this.colorsDivId);
+                var scrollHeight = colorsEl.scrollHeight;
+                var scrollTop = colorsEl.scrollTop;
+                if (scrollTop + this.colorsViewHeight >= scrollHeight) {
+                    this.renderColorsView();
+                }
+            },
+            regenerateColors: function () {
+                document.getElementById(this.selectedColorId).classList.remove(this.highlightColor);
+                var colors = document.getElementById(this.colorsDivId).childNodes;
+                for (var color = 0; color < colors.length; color++) {
+                    colors[color].style.backgroundColor = this.getRandomColor();
+                }
+            },
+            getRandomColor: function () {
+                var letters = '0123456789ABCDEF'.split('');
+                var color = '#';
+                for (var i = 0; i < this.colorCodeLength; i++) {
+                    color += letters[Math.floor(Math.random() * letters.length)];
+                }
+                return color;
+            },
+            renderGridSettingOption: function () {
+                var select = document.getElementById(this.gridSelectId);
+                for (var size = 2; size <= this.gridSizeMaxLimit; size++) {
+                    var option = document.createElement("option");
+                    option.text = size;
+                    option.value = size;
+                    select.appendChild(option);
+                }
+            },
+            changeGrid: function () {
+                var selectEl = document.getElementById(this.gridSelectId);
+                this.settings.gridSize = selectEl.options[selectEl.selectedIndex].value;
+                this.renderGridView();
+                this.saveGridSizeOption();
+            },
+            changeColorsView: function (colors) {
+                if (this.validateUserInput(colors) === true) {
+                    if (this.settings.colors == colors) {
+                        return;
+                    }
+                    var colorsEl = document.getElementById(this.colorsDivId);
+                    colorsEl.innerHTML = '';
+                    this.colorsVisible = 0;
+                    this.settings.colors = colors;
+                    this.renderColorsView();
+                    this.saveColorsOption();
+                }
+            },
+            validateUserInput: function (colors) {
+                if (isNaN(colors)) {
+                    window.alert("Please enter number values.");
+                    return false;
+                }
+                if (colors > this.maxColorsAllowed) {
+                    window.alert("Max colors supported 16,777,216. Enter a smaller value.");
+                    return false;
+                }
+                if (colors < this.minColors) {
+                    window.alert("Please enter atleast 2 colors.");
+                    return false;
+                }
+                return true;
+            },
+            onKeyUp: function (event) {
+                if (event.keyCode == this.enterKeyCode) {
+                    document.getElementById(this.saveButtonId).click();
+                }
+            },
+            saveGridSizeOption: function () {
+                if (typeof(Storage) !== 'undefined') {
+                    sessionStorage.gridSize = this.settings.gridSize;
+                }
+            },
+            saveColorsOption: function () {
+                if (typeof(Storage) !== 'undefined') {
+                    sessionStorage.colors = this.settings.colors;
+                }
+            },
+            increaseSquareSize: function () {
+                this.squareDimension += 5;
+                this.resizeSquares();
+            },
+            decreaseSquareSize: function () {
+                if (this.squareDimension < this.minDimension) return;
+                this.squareDimension -= 5;
+                this.resizeSquares();
+
+            },
+            resizeSquares: function () {
+                var squares = document.getElementsByClassName('square');
+                for (var square = 0; square < squares.length; square++) {
+                    squares[square].style.width = this.squareDimension + 'px';
+                    squares[square].style.height = this.squareDimension + 'px';
+                }
+                document.getElementById(this.gridDivId).style.width = this.settings.gridSize * this.squareDimension + 'px';
+            }
+        };
+
+        window.onload = function () {
+            colorApp.init();
+        };
+
+    </script>
+    <title>Color-It!</title>
+</head>
+<body>
+<div id="title">Color-It!</div>
+<div id="header">
+    <div id="regenerate-colors">
+        <a href="#/" onClick="colorApp.regenerateColors();">Regenerate Colors</a>
+    </div>
+    <div id="colors-setting">
+        # Colors: <input id="colors-count" type="text" name="colors" value=8
+                         onkeyup="colorApp.onKeyUp(event);">
+        <button id="save-button" type="submit" value="Submit"
+                onClick="colorApp.changeColorsView(document.getElementById('colors-count').value);">Save
+        </button>
+    </div>
+</div>
+
+<div id="view">
+    <div id="colors-view" onscroll="colorApp.addColors();"></div>
+    <div style="margin: 5px;">
+        <span id="selected-color-span">Selected Color: <span id="selected-color"></span></span>
+        <div id="resize-squares">
+            <a href="#/" onClick="colorApp.increaseSquareSize();">+</a>
+            <a href="#/" onClick="colorApp.decreaseSquareSize();">-</a>
+        </div>
+        <div id="select-grid-div">
+            Grid-Size: <select id="select-grid-size" onchange="colorApp.changeGrid();">
+        </select>
+        </div>
+    </div>
+    <div id="grid-view">
+        <div id="grid"></div>
+    </div>
+</div>
+
+<div id="footer">Prashant Kumar, Iowa State University</div>
+</body>
+</html>
